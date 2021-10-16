@@ -32,10 +32,10 @@ function σ0_I127(F1, F2, T, P, γ, M = ATOM_DATA[ATOM_DATA.Name .== "I127", :M]
     k0 = k_I127(F1, F2)
     ν0 = k0 * c_0
     νd = fwhm_doppler(ν0, M, T)
-    νc = 2 * γ * P
-    ν0, νd, νc = promote((ν0, νd, νc)...)
+    νp = 2 * γ * P
+    ν0, νd, νp = promote((ν0, νd, νp)...)
     σ0 = uconvert(u"cm^2*s^-1", A / k0^2 / 8π)
-    voigt_peak = uconvert(u"s", profile_voigt(ν0; ν0 = ν0, νd = νd, νc = νc))
+    voigt_peak = uconvert(u"s", profile_voigt(ν0; ν0 = ν0, νd = νd, νp = νp))
     σ0_peak = uconvert(u"cm^2", σ0 * voigt_peak)
     return (σ0, σ0_peak)
 end
