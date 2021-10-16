@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.15.1
+# v0.16.1
 
 using Markdown
 using InteractiveUtils
@@ -15,25 +15,35 @@ end
 
 # ╔═╡ 975815a4-7825-4cb0-8628-c8c4378221e8
 begin
-	using Pkg
-	Pkg.activate()
-	push!(LOAD_PATH, joinpath(pwd(), "src"))
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.add("DataFrames")
+	Pkg.add("PhysicalConstants")
+	Pkg.add("Unitful")
+	Pkg.add("HalfIntegers")
+	Pkg.add("UnitfulRecipes")
+	Pkg.add("PlutoUI")
+	Pkg.add("Plots")
+	Pkg.add("LaTeXStrings")
+	Pkg.add(url = "https://github.com/lihua-cat/LineProfile.jl")
+	Pkg.add(url = "https://github.com/lihua-cat/ZeemanSpectra.jl")
 end
+
+# ╔═╡ b1bb7864-18c3-4074-bf78-90228b11721d
+# import ZeemanSpectra: atom_df, zeeman_struc, zeeman_spec, profile_voigt, fwhm_doppler, transition_matrix_element_m1_total, k_I127, A_I127, σ0_I127
+using ZeemanSpectra
+
+# ╔═╡ 0ae40869-59a2-4e54-b205-61f52c6480d8
+using HalfIntegers
 
 # ╔═╡ f9b30b0c-f219-40f4-ac2c-6eefcb5f12d6
 using DataFrames
-
-# ╔═╡ b0dc9fa9-3ab3-404a-bddb-5106f6fbce69
-using HalfIntegers
 
 # ╔═╡ be11d03a-0646-43d1-a1f6-186e6a5bdb87
 using Unitful, UnitfulRecipes
 
 # ╔═╡ b7a234a2-b520-4417-8814-5f5d51723521
 using LaTeXStrings
-
-# ╔═╡ ad5d036f-2b12-47fe-b695-338283d5ea58
-using BenchmarkTools
 
 # ╔═╡ a2d38136-b186-4984-a960-ced4effad6cf
 using Plots;gr()
@@ -43,9 +53,6 @@ using PlutoUI
 
 # ╔═╡ 350d9f41-85f8-457c-8b5a-a6a86ce95d62
 md"# Zeeman Spectra"
-
-# ╔═╡ b1bb7864-18c3-4074-bf78-90228b11721d
-import Zeeman: atom_df, zeeman_struc, zeeman_spec, profile_voigt, fwhm_doppler, transition_matrix_element_m1_total, k_I127, A_I127, σ0_I127
 
 # ╔═╡ c3023a88-bbd7-4ae5-b3bf-1c799bd5cec0
 import PhysicalConstants.CODATA2018: c_0, k_B, h, μ_0, μ_B
@@ -57,7 +64,7 @@ default(;framestyle=:box, widen=true, fg_legend = :gray80, dpi=300, gridalpha=0.
 md"# 1. atom data"
 
 # ╔═╡ bc4c88ac-d80f-4bcd-bc4d-341bbfb07c7c
-atom_df
+ATOM_DATA
 
 # ╔═╡ 1c015f1b-f0b3-4f76-836b-2d6f40f0792b
 md"# 2. Zeeman splits"
@@ -118,7 +125,7 @@ atom_state2 = "g"
 @bind P Slider(0:20, default = 10, show_value=true)
 
 # ╔═╡ 21ee843a-9f6a-4193-a761-0449a7534a14
-νc = 2 * 5 * P
+νp = 2 * 5.0 * P
 
 # ╔═╡ 7de22e25-ddd4-41f9-a469-bd3321485e8b
 md"### 1. no magentic field"
@@ -130,38 +137,23 @@ begin
 	k34_0 = abs(df1[1, :E] - df2[1, :E])
 end
 
+# ╔═╡ ac3e2486-b453-475f-a763-f83d3c6dd13c
+νd = fwhm_doppler(k34_0*c_0, ATOM_DATA[ATOM_DATA.Name .== atom_name, :M][], T*u"K") |> u"MHz"
+
 # ╔═╡ 6866a683-b30a-457f-86cd-d53c5c65f8f6
 kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 
 # ╔═╡ bb71c05f-151d-4078-91c6-27791ab46d5f
-einstein_A_m1(λ, L, S, J, I, F) = uconvert(u"s^-1", 64π^4 / (3h * λ^3) * μ_0 / 4π * μ_B^2 * transition_matrix_element_m1_total(L, S, J, I, F)^2) / (2F[1] + 1)
+#einstein_A_m1(λ, L, S, J, I, F) = uconvert(u"s^-1", 64π^4 / (3h * λ^3) * μ_0 / 4π * μ_B^2 * transition_matrix_element_m1_total(L, S, J, I, F)^2) / (2F[1] + 1)
+
+# ╔═╡ 61fbcc32-0d38-47df-9ae5-5a28e21b9d25
+line_profile_peak = uconvert(u"s", profile_voigt(0.0u"MHz";ν0 = 0.0u"MHz", νd = νd, νp = νp*u"MHz"))
 
 # ╔═╡ 53509b73-044d-4412-afe8-2e595a69bbfa
 F1_list = 3:-1:2
 
 # ╔═╡ 91a2ddee-d130-45e9-b12a-6b1deebd8721
 F2_list = 4:-1:1
-
-# ╔═╡ a1b1392a-6b27-42c3-8c46-9f9639bcaaf6
-σ0_ls = σ0_I127(3, 4, T*u"K", P*u"Torr")[2] 
-
-# ╔═╡ be9d0b08-ee75-4f55-bea4-363f2cb31eaf
-md"### 2. with magentic field"
-
-# ╔═╡ da670bf1-82a8-4575-8a30-e0be282291c0
-@bind BF Slider(0:1000, default = 200, show_value=true)
-
-# ╔═╡ c409ed85-e506-4740-93d9-68f9ac4fb060
-kc = uconvert(u"cm^-1", νc*u"MHz"/c_0)
-
-# ╔═╡ da1bf1d4-37ed-4f85-8f51-395d80eaf295
-m = atom_df[atom_df.Name .== atom_name, :M][]
-
-# ╔═╡ ac3e2486-b453-475f-a763-f83d3c6dd13c
-νd = fwhm_doppler(k34_0*c_0, m, T*u"K")
-
-# ╔═╡ 61fbcc32-0d38-47df-9ae5-5a28e21b9d25
-line_profile_peak = uconvert(u"s", profile_voigt(0.0u"MHz";ν0 = 0.0u"MHz", νd = νd, νc = νc*u"MHz"))
 
 # ╔═╡ c0425020-25cc-4ce9-9a7a-4766824831b4
 begin
@@ -173,10 +165,10 @@ begin
 	for F1 in F1_list
 		for F2 in F2_list
 			k = abs(df1[df1.F .== F1, :E][1] - df2[df2.F .== F2, :E][1])
-			A = einstein_A_m1(1/k, L, S, J, I, (F1, F2))
+			A = einstein_A_m1(k, L, S, J, I, (F1, F2))
 			gA = (2F1 + 1) * A
 			σm = A / k^2 / 8π * line_profile_peak
-			σ = A / k^2 / 8π * uconvert.(u"s", profile_voigt.(kx.*c_0;ν0 = k*c_0, νd = νd, νc = νc*u"MHz"))
+			σ = A / k^2 / 8π * uconvert.(u"s", profile_voigt.(u"MHz".(kx.*c_0);ν0 = u"MHz"(k*c_0), νd = νd, νp = νp*u"MHz"))
 			tme = transition_matrix_element_m1_total(L, S, J, I, (F1, F2))^2
 			push!(df_A, (F1, F2, k, A, gA, σm, tme, σ))
 		end
@@ -190,6 +182,9 @@ begin
 	select!(df_A, Not(:tme))
 	df_A
 end
+
+# ╔═╡ a1b1392a-6b27-42c3-8c46-9f9639bcaaf6
+σ0_ls = σ0_I127(3, 4, T*u"K", P*u"Torr", 5u"MHz/Torr")[2]
 
 # ╔═╡ 63e89889-143d-443c-a79b-4c4d3c280d36
 let
@@ -213,13 +208,22 @@ let
 	xlabel!(L"k(\mathrm{cm^{-1}})")
 end
 
+# ╔═╡ be9d0b08-ee75-4f55-bea4-363f2cb31eaf
+md"### 2. with magentic field"
+
+# ╔═╡ da670bf1-82a8-4575-8a30-e0be282291c0
+@bind BF Slider(0:1000, default = 200, show_value=true)
+
+# ╔═╡ c409ed85-e506-4740-93d9-68f9ac4fb060
+kc = uconvert(u"cm^-1", νp*u"MHz"/c_0)
+
 # ╔═╡ 3bd2fbac-8895-417e-a923-b64aac906f78
-upreferred(νc*u"MHz"/νd)
+upreferred(νp*u"MHz"/νd)
 
 # ╔═╡ fab9a0c5-3255-4dc1-af66-e7f912746f93
 begin
-	iodine_spec(kx, T, νc, BF) = zeeman_spec(atom_name, atom_state1, atom_state2, kx, T*u"K", νc*u"MHz", BF*u"Gauss")
-	df_E, df_CS = iodine_spec(kx, T, νc, BF)
+	iodine_spec(kx, T, νp, BF) = zeeman_spec(atom_name, atom_state1, atom_state2, kx, T*u"K", νp*u"MHz", BF*u"Gauss")
+	df_E, df_CS = iodine_spec(kx, T, νp, BF)
 	df_CS
 end
 
@@ -268,7 +272,7 @@ end
 let
 	plot(legend = false)
 	kx = collect(7603.07:0.0001:7603.2)u"cm^-1"
-	df_E, df_CS = iodine_spec(kx, T, νc, BF)
+	df_E, df_CS = iodine_spec(kx, T, νp, BF)
 	df34 = df_F1_F2(3, 4, ("S",), df_CS)
 	x = ustrip.(u"cm^-1", kx)
 	i = 1
@@ -294,7 +298,7 @@ end
 function σ_B(B_range, F1_list, F2_list)
 	σ_ma = Matrix{Unitful.Area}(undef, length(B_range), length(F1_list)*length(F2_list))
 	for i in 1:length(B_range)
-		df_E, df_CS = iodine_spec(kx, T, νc, B_range[i])
+		df_E, df_CS = iodine_spec(kx, T, νp, B_range[i])
 		j = 1
 		for F1 in F1_list
 			for F2 in F2_list
@@ -332,8 +336,8 @@ end
 
 # ╔═╡ f4a173ae-71dc-407f-8420-ae59c2f6a22f
 function plot_spec(BF; kx = kx, atom_name = atom_name, atom_state1 = atom_state1, 
-	atom_state2 = atom_state2, T = T, νc = νc)
-	df_E, df_CS = zeeman_spec(atom_name, atom_state1, atom_state2, kx, T*u"K", νc*u"MHz", BF*u"Gauss")
+	atom_state2 = atom_state2, T = T, νp = νp)
+	df_E, df_CS = zeeman_spec(atom_name, atom_state1, atom_state2, kx, T*u"K", νp*u"MHz", BF*u"Gauss")
 	plot()
 	yp = sum(df_CS[df_CS.polarization .== "P", :σ])*1e18
 	ys = sum(df_CS[df_CS.polarization .== "S", :σ])/2*1e18
@@ -341,7 +345,7 @@ function plot_spec(BF; kx = kx, atom_name = atom_name, atom_state1 = atom_state1
 	plot!(kx, yp, lw = 1, label = "P")
 	plot!(kx, ys, lw = 1, label = "S")
 	annotate!([(7602.25, 0.9ymax, Plots.text("B = $BF", 16, :blue, :left))])
-	annotate!([(7602.25, 0.8ymax, Plots.text("νc = $(round(ustrip(u"cm^-1", kc), sigdigits = 2))"*" cm^-1", 8, :red, :left))])
+	annotate!([(7602.25, 0.8ymax, Plots.text("νp = $(round(ustrip(u"cm^-1", kc), sigdigits = 2))"*" cm^-1", 8, :red, :left))])
 	annotate!([(7602.25, 0.75ymax, Plots.text("νd = $(round(ustrip(u"cm^-1", νd/c_0), sigdigits = 2))"*" cm^-1", 8, :red, :left))])
 	title!(L"\textrm{\sffamily Zeeman spectra}")
 	ylabel!(L"\textrm{\sffamily transition cross section}(10^{-18}\mathrm{cm^2})")
@@ -351,22 +355,15 @@ end
 # ╔═╡ d84030c2-c707-4129-94f3-4709bc2d82e5
 plot_spec(BF);plot!(;legend = :topright)
 
-# ╔═╡ 6da83190-3ba3-43fd-8048-74a39dc28dbd
-LocalResource("F:/OneDrive/Code/COIL MGS/plots/B0_500fps10.gif")
-
-# ╔═╡ 43217930-39d1-4d2e-91e8-9b9ddc473d4b
-# @benchmark zeeman_spec($atom_name, $atom_state1, $atom_state2, $kx, $(T*u"K"), $(νc*u"MHz"), $(BF*u"Gauss"))
-
 # ╔═╡ Cell order:
 # ╟─350d9f41-85f8-457c-8b5a-a6a86ce95d62
 # ╠═975815a4-7825-4cb0-8628-c8c4378221e8
 # ╠═b1bb7864-18c3-4074-bf78-90228b11721d
 # ╠═c3023a88-bbd7-4ae5-b3bf-1c799bd5cec0
+# ╠═0ae40869-59a2-4e54-b205-61f52c6480d8
 # ╠═f9b30b0c-f219-40f4-ac2c-6eefcb5f12d6
-# ╠═b0dc9fa9-3ab3-404a-bddb-5106f6fbce69
 # ╠═be11d03a-0646-43d1-a1f6-186e6a5bdb87
 # ╠═b7a234a2-b520-4417-8814-5f5d51723521
-# ╠═ad5d036f-2b12-47fe-b695-338283d5ea58
 # ╠═a2d38136-b186-4984-a960-ced4effad6cf
 # ╠═f7bc1fc7-9fbc-4189-a304-6e3e78b6af67
 # ╠═bc55edf6-87c7-4408-8808-a42ac364f916
@@ -385,6 +382,7 @@ LocalResource("F:/OneDrive/Code/COIL MGS/plots/B0_500fps10.gif")
 # ╠═3df50cb9-95a7-43dd-a19f-1c4222a8f557
 # ╠═15376045-e511-4011-b304-ed84ee537b0e
 # ╠═21ee843a-9f6a-4193-a761-0449a7534a14
+# ╠═ac3e2486-b453-475f-a763-f83d3c6dd13c
 # ╟─7de22e25-ddd4-41f9-a469-bd3321485e8b
 # ╠═5457ab5f-faa5-46e5-8479-f4332b4c0f8d
 # ╠═6866a683-b30a-457f-86cd-d53c5c65f8f6
@@ -399,8 +397,6 @@ LocalResource("F:/OneDrive/Code/COIL MGS/plots/B0_500fps10.gif")
 # ╟─be9d0b08-ee75-4f55-bea4-363f2cb31eaf
 # ╠═da670bf1-82a8-4575-8a30-e0be282291c0
 # ╠═c409ed85-e506-4740-93d9-68f9ac4fb060
-# ╠═da1bf1d4-37ed-4f85-8f51-395d80eaf295
-# ╠═ac3e2486-b453-475f-a763-f83d3c6dd13c
 # ╠═3bd2fbac-8895-417e-a923-b64aac906f78
 # ╠═fab9a0c5-3255-4dc1-af66-e7f912746f93
 # ╠═e0745cb9-5a23-4528-a2d6-9e8b4073f1d9
@@ -413,5 +409,3 @@ LocalResource("F:/OneDrive/Code/COIL MGS/plots/B0_500fps10.gif")
 # ╟─77e24d0b-83d9-4567-8cf5-d075b5bf7b14
 # ╠═f4a173ae-71dc-407f-8420-ae59c2f6a22f
 # ╟─d84030c2-c707-4129-94f3-4709bc2d82e5
-# ╠═6da83190-3ba3-43fd-8048-74a39dc28dbd
-# ╠═43217930-39d1-4d2e-91e8-9b9ddc473d4b
