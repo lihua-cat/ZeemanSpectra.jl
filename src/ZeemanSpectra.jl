@@ -46,6 +46,7 @@ export we_Tkq, rme_J, uncoup_T1k, uncoup_T2k
 include("wigner_eckart.jl")
 #-------------- transition_matrix_element ---------------------------
 export transition_matrix_element_m1, transition_matrix_element_e1
+export transition_matrix_element_m1_total, transition_matrix_element_e1_total
 
 include("transition_matrix_element.jl")
 #-------------- transition_cross_section  ---------------------------
