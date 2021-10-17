@@ -14,6 +14,7 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 WignerSymbols = "9f57e263-0b3d-5e2e-b1be-24f2bb48858b"
 
 [compat]
+WignerSymbols = "2"
 PhysicalConstants = "0.2"
 DataFrames = "1"
 julia = "1"
