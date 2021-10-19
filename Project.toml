@@ -16,6 +16,7 @@ WignerSymbols = "9f57e263-0b3d-5e2e-b1be-24f2bb48858b"
 [compat]
 HalfIntegers = "1"
 Unitful = "1"
+LineProfile = "1"
 RationalRoots = "0.2"
 WignerSymbols = "2"
 PhysicalConstants = "0.2"
