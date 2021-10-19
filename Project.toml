@@ -1,7 +1,7 @@
 name = "ZeemanSpectra"
 uuid = "1a51ffc3-a734-4581-93fb-13c6a2992147"
 authors = ["Wemko <yinyangxiangsheng@gmail.com> and contributors"]
-version = "0.1.0"
+version = "1.0.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
