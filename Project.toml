@@ -19,7 +19,6 @@ PhysicalConstants = "0.2"
 Unitful = "1"
 LineProfile = "1"
 RationalRoots = "0.2"
-Unitful = "1"
 WignerSymbols = "2"
 julia = "1"
 
