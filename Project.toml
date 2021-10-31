@@ -1,7 +1,7 @@
 name = "ZeemanSpectra"
 uuid = "1a51ffc3-a734-4581-93fb-13c6a2992147"
 authors = ["Wemko <yinyangxiangsheng@gmail.com> and contributors"]
-version = "0.1.0"
+version = "1.0.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
@@ -16,6 +16,8 @@ WignerSymbols = "9f57e263-0b3d-5e2e-b1be-24f2bb48858b"
 DataFrames = "1"
 HalfIntegers = "1"
 PhysicalConstants = "0.2"
+Unitful = "1"
+LineProfile = "1"
 RationalRoots = "0.2"
 Unitful = "1"
 WignerSymbols = "2"
