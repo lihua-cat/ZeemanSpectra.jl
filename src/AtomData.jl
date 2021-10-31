@@ -7,11 +7,11 @@ export ATOM_DATA
 #   isotope names
 Name = ["Li6", "K39", "K41", "Rb85", "Rb87", "Cs133", "I127"]
 
-#   relative atomic mass(1 u=1.66053906660(50)e−24 g)
+#   relative atomic mass(1 u = 1.66053906660(50)e−24 g)
 M = [6.0151214, 38.9637, 40.9618, 84.9118, 86.9092, 132.9055, 126.9]u"u"
 
 #   nuclear spin quantum number
-I = HalfInt.([1, 3 // 2, 3 // 2, 5 // 2, 3 // 2, 7 // 2, 5 // 2])
+I = Vector{HalfInt}([1, 3//2, 3//2, 5//2, 3//2, 7//2, 5//2])
 
 #   nuclear Lande g-factor
 gI = [0, 0.261, 0.143, 0.539, 1.827, 0.732, 1.1232]
@@ -42,17 +42,17 @@ Be2 = [-0.0033, 0.094398639, 0.111410408, 0.863263878, 0.417622247, -0.012675436
 
 
 # dataframe construct
-const ATOM_DATA = DataFrame(Name = Name,
-                          M    = M,
-                          I    = I,
-                          gI   = gI,
-                          D1   = D1,
-                          D2   = D2,
-                          Ag   = Ag,
-                          Bg   = Bg,
-                          Ae1  = Ae1,
-                          Be1  = Be1,
-                          Ae2  = Ae2,
-                          Be2  = Be2)
+ATOM_DATA = DataFrame(Name = Name,
+                      M    = M,
+                      I    = I,
+                      gI   = gI,
+                      D1   = D1,
+                      D2   = D2,
+                      Ag   = Ag,
+                      Bg   = Bg,
+                      Ae1  = Ae1,
+                      Be1  = Be1,
+                      Ae2  = Ae2,
+                      Be2  = Be2)
 
 end # of module
