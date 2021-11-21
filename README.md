@@ -12,17 +12,17 @@ ZeemanSpectra.jl is a julia package for computing hyperfine structure of alkali 
         1. [x] 1. $^{127}\mathrm{I}$
         2. [ ] 2. $^{129}\mathrm{I}$
 2. Angular momentum operators
-    - [ ] ladder operator: $J_+$ and $J_-$ ($I$ as well)
-    - [ ] $J^2$, $J_z$ ($I$ as well)
-    - [ ] any combination of above oprators, such as $J_zJ_+I_zI_-$
-3. Perturbed hamiltonian matrix of zeeman effect of the hyperfine structure
-    - [ ] $\hat{H'} = \hat{H}_{Zeeman} + \hat{H}_{hfs}$
+    - [x] ladder operator: $J_+$ and $J_-$ ($I$ as well)
+    - [x] $J^2$, $J_z$ ($I$ as well)
+    - [x] any combination of above oprators, such as $J_zJ_+I_zI_-$
+3. Perturbed hamiltonian matrix of zeeman effect and the hyperfine interaction
+    - [x] $\hat{H'} = \hat{H}_{Zeeman} + \hat{H}_{hfs}$
 4. Degenerate perturbation theory (hamiltonian diagonalization)
-    - [ ] level splits (eigenvalues)
-    - [ ] quantum states (eigenstates)
+    - [x] level splits (eigenvalues)
+    - [x] quantum states (eigenstates)
 5. Irreducible tensor operators
-    - [ ] Wigner-Eckart theorem
-    - [ ] ...
+    - [x] Wigner-Eckart theorem
+    - [x] ...
 6. Transition line strength
     - [ ] E1 Electric diople radiation
     - [ ] M1 Magnetic diople radiation
