@@ -23,7 +23,8 @@ function zeeman_struc(atom::Atom, level_num::Int = 0, BF::BField = 0u"Gauss")
     for MF in keys(basis_df).MF
         basis1 = basis_df[MF].basis1
         basis2 = basis_df[MF].basis2
-        h = hamiltonian_total(basis1, A, B, BF, atom.gI, atom.M)
+        gl = 1 - 𝑚e / atom.M
+        h = hamiltonian_total(basis1, A, B, BF, μB = 𝜇B, μN = 𝜇N, gl = gl, gs = gS, gI = atom.gI)
         vals, vecs1 = diagonal(h)
         vecs2 = [basistransform(v, basis2) for v in vecs1]
         for i in 1:length(vals)
