@@ -94,7 +94,7 @@ function zeeman_struc(atom_name::String,
     end
     S, L, J, I = HalfInt.((S, L ,J, I))
     gJ = gL * (aa(J) - aa(S) + aa(L))/2aa(J) + 
-    gs * (aa(J) + aa(S) - aa(L))/2aa(J)
+        gs * (aa(J) + aa(S) - aa(L))/2aa(J)
     #   hyperfine interaction coefficients A, B
     A = ustrip(u"cm^-1", dfrow[Symbol("A"*atom_state)])
     B = ustrip(u"cm^-1", dfrow[Symbol("B"*atom_state)])

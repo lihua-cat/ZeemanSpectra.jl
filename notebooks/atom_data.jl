@@ -9,7 +9,7 @@ using Unitful, DataFrames, HalfIntegers
 
 # ╔═╡ 953762ae-394e-11ec-29a9-3107b40424c6
 begin
-	include("../src/Atoms.jl")
+	include("../src_old/Atoms.jl")
 	using .Atoms
 	Li6
 end
