@@ -29,6 +29,8 @@ function zeeman_struc(atom::Atom, level_num::Int = 0, BF::BField = 0u"Gauss")
         if A >= zero(A)&&B >= zero(B)
             reverse!(vals)
             reverse!(vecs1)
+        elseif sign(A * B) == -1
+            error("strange hyperfine constant")
         end
         vecs2 = [basistransform(v, basis2) for v in vecs1]
         for i in 1:length(vals)
