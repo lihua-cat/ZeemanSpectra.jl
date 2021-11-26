@@ -28,6 +28,7 @@ function zeeman_struc(atom::Atom, level_num::Int = 0, BF::BField = 0u"Gauss")
         vals, vecs1 = diagonal(h)
         if A >= zero(A)&&B >= zero(B)
             reverse!(vals)
+            reverse!(vecs1)
         end
         vecs2 = [basistransform(v, basis2) for v in vecs1]
         for i in 1:length(vals)

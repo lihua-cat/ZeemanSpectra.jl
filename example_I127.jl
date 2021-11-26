@@ -41,10 +41,10 @@ BF = 0.0u"Gauss"
 kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 
 T = 200u"K"
-P = 0u"Torr"
+P = 10u"Torr"
 νp = 2 * 5u"MHz/Torr" * P
 
-df_spec = zeeman_spec(atom, 0, 1, kx, T, νp, BF)
+df_spec = zeeman_spec(atom, 1, 0, kx, T, νp, BF)
 
 let
     fig = Figure()
