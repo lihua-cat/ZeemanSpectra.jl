@@ -26,6 +26,9 @@ function zeeman_struc(atom::Atom, level_num::Int = 0, BF::BField = 0u"Gauss")
         gl = 1 - 𝑚e / atom.M
         h = hamiltonian_total(basis1, A, B, BF, μB = 𝜇B, μN = 𝜇N, gl = gl, gs = gS, gI = atom.gI)
         vals, vecs1 = diagonal(h)
+        if A >= zero(A)&&B >= zero(B)
+            reverse!(vals)
+        end
         vecs2 = [basistransform(v, basis2) for v in vecs1]
         for i in 1:length(vals)
             vec1 = vecs1[i]
@@ -38,5 +41,6 @@ function zeeman_struc(atom::Atom, level_num::Int = 0, BF::BField = 0u"Gauss")
             push!(df, [F, MF, val, val+level.E, vec1, vec2])
         end
     end
-    return sort!(df, [:F, :MF], rev=true)
+    sort!(df, [:F, :MF], rev=true)
+    return df
 end

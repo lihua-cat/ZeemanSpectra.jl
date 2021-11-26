@@ -20,11 +20,17 @@ for B in B_range
     end
 end
 
+F_list = zeeman_struc(atom, 0, B_range[1]).F
+
 let
     fig = Figure()
     ax = Axis(fig[1, 1])
 
-    [lines!(ax, ustrip.(B_range), ustrip.(E)) for E in eachrow(E_mat)]
+    color = [:blue, :orange, :green, :red]
+
+    for n in 1:size(E_mat, 1)
+        lines!(ax, ustrip.(B_range), ustrip.(E_mat[n, :]), color = color[Int(F_list[n])])
+    end
     
     fig
 end

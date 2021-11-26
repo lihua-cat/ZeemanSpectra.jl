@@ -10,9 +10,10 @@ atom = Li6
 
 ##
 B_range = (0:0.01:10)u"Gauss"
+level = 2
 E_mat = []
 for B in B_range
-    Ev = zeeman_struc(atom, 2, B).ES
+    Ev = zeeman_struc(atom, level, B).ES
     if B == B_range[1]
         E_mat = Ev
     else
@@ -20,12 +21,18 @@ for B in B_range
     end
 end
 
+F_list = zeeman_struc(atom, level, B_range[1]).F
+
 let
     fig = Figure()
     ax = Axis(fig[1, 1])
 
-    [lines!(ax, ustrip.(B_range), ustrip.(E)) for E in eachrow(E_mat)]
-    
+    color = [:blue, :orange, :green, :red]
+
+    for n in 1:size(E_mat, 1)
+        lines!(ax, ustrip.(B_range), ustrip.(E_mat[n, :]), label = "$(F_list[n])", color = color[Int(F_list[n]+1/2)])
+    end
+    axislegend(ax)
     fig
 end
 
