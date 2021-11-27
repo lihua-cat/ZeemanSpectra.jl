@@ -61,7 +61,6 @@ let
 	J1, J2 = s1.state.J, s2.state.J
 	I = atom.I
 	c2 = reducedME_M1(L1, S1, J1, L2, S2, J2)
-	c3 = μ_0 / 4π * μ_B^2
 	df = DataFrame(F2=[], F1=[], k = [], c = [], A = [])
 	for F1 in 4:-1:1, F2 in 3:-1:2
 		E1 = filter(row -> row.F == F1, zeeman_struc(atom, 0, B)).E
@@ -71,7 +70,7 @@ let
 		k = E2[1] - E1[1]
 		c1 = uncoup_T1(J1, I, F1, J2, I, F2, 1)
 		c = (c1 * c2)^2
-		A = 64π^4 / 3h * k^3 * c3 * c / (2F2 + 1) |> u"s^-1"
+		A = 64π^4 / 3h * k^3 * c / (2F2 + 1) |> u"s^-1"
 		push!(df, (F2, F1, k, c1^2, A))
 	end
 	df.c = df.c / sum(df.c)
@@ -88,7 +87,7 @@ let
 	P = 10u"Torr"
 	νp = 2 * 5u"MHz/Torr" * P
 	
-	df_spec = zeeman_spec(atom, 1, 0, kx, T, νp, BF)
+	df_spec = zeeman_spec(atom, 1, 0, kx, T, νp, "M1", BF)
 	df34 = filter(row->row.F1 == 3 && row.F2 == 4, df_spec)
 	df1 = filter(row->row.q == 0, df34)
 	df2 = filter(row->row.q == -1, df34)
