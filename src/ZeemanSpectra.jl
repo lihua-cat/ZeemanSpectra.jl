@@ -1,6 +1,6 @@
 module ZeemanSpectra
 
-import PhysicalConstants.CODATA2018: c_0 as 𝑐, h as ℎ, μ_B, m_e as 𝑚e, m_p as 𝑚p, μ_0 as 𝜇0
+import PhysicalConstants.CODATA2018: c_0 as 𝑐, h as ℎ, μ_B, m_e as 𝑚e, m_p as 𝑚p, μ_0 as 𝜇0, ε_0 as 𝜀₀, e as 𝑒, a_0 as 𝑎₀
 using Unitful
 import Unitful: Wavenumber, Frequency, Area, BField, Quantity
 using HalfIntegers
@@ -24,10 +24,13 @@ include("hamiltonian.jl")
 export zeeman_struc
 include("zeeman structure.jl")
 
+export einsteinA, aᵢⱼ
+include("transition cross section.jl")
+
 export zeeman_spec
 include("zeeman spectra.jl")
 
-export einstein_A_M1, k_I127, A_I127, σ0_I127, line_I127
-include("transition cross section.jl")
+export k_I127, A_I127, σ0_I127, line_I127
+include("I127.jl")
 
 end

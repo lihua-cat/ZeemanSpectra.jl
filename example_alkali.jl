@@ -39,7 +39,7 @@ end
 ##
 BF = 0.0u"Gauss"
 
-lu = 2
+lu = 1
 ll = 0
 
 if atom == Li6
@@ -50,11 +50,11 @@ if atom == Li6
     end
 end
 
-T = 1u"K"
+T = 50u"K"
 P = 0u"Torr"
 νp = 2 * 5u"MHz/Torr" * P
 
-df_spec = zeeman_spec(atom, lu, ll, kx, T, νp, BF)
+df_spec = zeeman_spec(atom, ll, lu, kx, T, νp, "E1", BF)
 
 let
     fig = Figure()
@@ -63,8 +63,12 @@ let
     kxu = ustrip(kx)
     offset = round(Int, kxu[1])
 
-    line_p = lines!(ax, kxu .- offset, sum(df_spec[df_spec.q .== 0, :c]), label = "q = 0")
-    line_s = lines!(ax, kxu .- offset, sum(df_spec[abs.(df_spec.q) .== 1, :c])/2, label = "q = ±1")
+    for F1 in Set(df_spec.F1), F2 in Set(df_spec.F2)
+        p = sum(filter(row->row.F1==F1&&row.F2==F2, df_spec).c)
+        lines!(ax, kxu .- offset, p, label = "$F2 -> $F1")
+    end
+    # line_p = lines!(ax, kxu .- offset, sum(df_spec[df_spec.q .== 0, :c]), label = "q = 0")
+    # line_s = lines!(ax, kxu .- offset, sum(df_spec[abs.(df_spec.q) .== 1, :c])/2, label = "q = ±1")
 
     ax.xtickformat = xs -> ["$(x + offset)" for x in xs]
     axislegend()

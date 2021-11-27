@@ -8,7 +8,14 @@ function zeeman_spec(atom::Atom,
                      l1::Int, l2::Int, 
                      kx::Vector{<:Wavenumber},
                      T::Unitful.AbsoluteScaleTemperature, νp::Frequency,
+                     term::String,
                      BF::BField = 0.0u"Gauss")
+    level1 = l1 == 0 ? atom.ground : atom.excited[l1]
+    (;L, S, J) = level1.state
+    L1, S1, J1 = L, S, J
+    level2 = l2 == 0 ? atom.ground : atom.excited[l2]
+    (;L, S, J) = level2.state
+    L2, S2, J2 = L, S, J
     df1 = zeeman_struc(atom, l1, BF)
     df2 = zeeman_struc(atom, l2, BF)
     n1 = nrow(df1)
@@ -38,7 +45,8 @@ function zeeman_spec(atom::Atom,
             ## radiation matrix element
             ket1 = df1[i, :Ket2]
             ket2 = df2[j, :Ket2]
-            c0 = relative_transition_intensity(ket1', ket2)^2
+            order = parse(Int, term[end])
+            c0 = relative_transition_intensity(ket1', ket2, order)^2
             ## line profile
             ν0 = uconvert(unit(νp), k0 * 𝑐)
             νd = fwhm_doppler(ν0, atom.M, T)
@@ -47,8 +55,12 @@ function zeeman_spec(atom::Atom,
             lineshape = profile_voigt.(νx; ν0 = ν0, νd = νd, νp = νp)
             c = c0 * ustrip.(lineshape)
             ## Einstein coefficient between two hfs state
-            C1 = 64π^4 / 3ℎ * k0^3 * 𝜇0 / 4π * μ_B^2
-            a = C1 * c0 |> u"s^(-1)"
+            if term == "E1"
+                ME = reducedME_E1(L1, S1, J1, L2, S2, J2)
+            elseif term == "M1"
+                ME = reducedME_M1(L1, S1, J1, L2, S2, J2)
+            end
+            a = aᵢⱼ(k0, c0*ME^2)
             ## transition cross section
             C2 = 1 / k0^2 / 8π
             σ = C2 * a * lineshape .|> u"cm^2"
