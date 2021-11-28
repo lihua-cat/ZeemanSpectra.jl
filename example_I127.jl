@@ -9,7 +9,7 @@ using GLMakie
 atom = I127
 
 ##
-B_range = (0:1:5000)u"Gauss"
+B_range = (0:1:4000)u"Gauss"
 E_mat = []
 for B in B_range
     E = zeeman_struc(atom, 0, B).ES
@@ -36,7 +36,7 @@ let
 end
 
 ##
-BF = 400.0u"Gauss"
+BF = 0.0u"Gauss"
 
 kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 

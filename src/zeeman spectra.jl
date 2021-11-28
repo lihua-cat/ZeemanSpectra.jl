@@ -22,19 +22,19 @@ function zeeman_spec(atom::Atom,
     n2 = nrow(df2)
     nt = n1 * n2
     df = DataFrame(
-                    F1 = Vector{HalfInteger}(undef, nt), 
-                    MF1 = Vector{HalfInteger}(undef, nt),
-                    F2 = Vector{HalfInteger}(undef, nt),
-                    MF2 = Vector{HalfInteger}(undef, nt),
-                    q = Vector{HalfInteger}(undef, nt),
-                    k0 = Vector{Wavenumber}(undef, nt),
-                    c0 = Vector{Float64}(undef, nt),
-                    c = Vector{Vector{Float64}}(undef, nt),
-                    a = Vector{Frequency}(undef, nt),
-                    σ0 = Vector{Area}(undef, nt),
-                    σ = Vector{Vector{Area}}(undef, nt)
+                    F1 = HalfInteger[], 
+                    MF1 = HalfInteger[],
+                    F2 = HalfInteger[],
+                    MF2 = HalfInteger[],
+                    q = HalfInteger[],
+                    k0 = Wavenumber[],
+                    c0 = Float64[],
+                    c = Vector{Float64}[],
+                    a = Frequency[],
+                    σ0 = Area[],
+                    σ = Vector{Area}[]
                   )
-    Threads.@threads for i in 1 : n1
+    for i in 1 : n1
         for j in 1 : n2
             F1 = df1[i, :F]
             F2 = df2[j, :F]
@@ -42,10 +42,11 @@ function zeeman_spec(atom::Atom,
             MF2 = df2[j, :MF]
             q = MF1 - MF2
             k0 = abs(df1[i, :E] - df2[j, :E])
+            order = parse(Int, term[end])
+            abs(q) > order && continue
             ## radiation matrix element
             ket1 = df1[i, :Ket2]
             ket2 = df2[j, :Ket2]
-            order = parse(Int, term[end])
             c0 = relative_transition_intensity(ket1', ket2, order)^2
             ## line profile
             ν0 = uconvert(unit(νp), k0 * 𝑐)
@@ -66,9 +67,9 @@ function zeeman_spec(atom::Atom,
             σ = C2 * a * lineshape .|> u"cm^2"
             σ0 = C2 * a * peak |> u"cm^2"
             ## df
-            n = (i - 1) * n2 + j
-            df[n, :] = F1, MF1, F2, MF2, q, k0, c0, c, a, σ0, σ
+            push!(df, (F1, MF1, F2, MF2, q, k0, c0, c, a, σ0, σ))
         end
     end
+    sort!(df, [:F1, :F2], rev=true)
     return df
 end
