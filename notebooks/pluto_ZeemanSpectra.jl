@@ -170,7 +170,7 @@ uncoup_T1(3/2, 5/2, 4, 1/2, 5/2, 3, 1)^2 * 7.939805013011782 * 2 / 7
 uncoup_T1(3/2, 5/2, 3, 1/2, 5/2, 3, 1)^2 * 7.939805013011782 * 2 / 7
 
 # ╔═╡ 70d1790d-7bb9-456d-82a3-cadae892803c
-md"2.spectra"
+md"2.transition cross section"
 
 # ╔═╡ 4155d55a-ea9c-4343-ae56-69705b94984b
 df_spec = let
@@ -198,11 +198,18 @@ df_spec = let
 	df
 end
 
-# ╔═╡ 9d1881e9-cdbd-4e6f-a52b-46c83e4e9734
-1.3e-16/√(200)
+# ╔═╡ cd826b82-1249-4e88-ac2b-7a25bfe24f61
+let
+	σ = 1.3e-16/√(200)
+	md"""
+	in [4], ``F'=3 \rightarrow F=4, \sigma = 1.3 \times 10^{16}/\sqrt{T}``(has been multiplied by 7/12)
+	
+	T = 200K, $\sigma/(7/12) =$ $(σ/(7/12))
+	"""
+end
 
 # ╔═╡ 5112acd1-614a-48d3-b826-9a6a56b3ade9
-σ0_I127(4, 3, T = 200u"K", P = 0u"Torr")
+σ0_I127(4, 3, T = 200u"K", P = 0u"Torr") * 7/12
 
 # ╔═╡ f33dfb79-0b28-4d14-95b5-4c49c075114c
 md"""
@@ -210,6 +217,7 @@ md"""
 1. Engleman, R., Keller, R. A. & Palmer, B. A. Hyperfine structure and isotope shift of the 1.3-μm transition of ^129l. Appl Optics 19, 2767 (1980).
 2. Kelly, M. A., McIver, J. K., Shea, R. F. & Hager, G. D. Frequency tuning of a CW atomic iodine laser via the Zeeman effect. Ieee J Quantum Elect 27, 263–273 (1991).
 3. Lilenfeld, H. V., Richardson, R. J. & Hovis, F. E. The electron spin resonance spectrum of the 2 P 1/2 state of atomic iodine. J Chem Phys 74, 2129–2132 (1981).
+4. Hager, G. D. et al. A simplified analytic model for gain saturation and power extraction in the flowing chemical oxygen-iodine laser. Ieee J Quantum Elect 32, 1525–1536 (1996).
   
 """
 
@@ -240,7 +248,7 @@ md"""
 # ╠═df5f0239-6f1a-4e6b-9236-9738dbc20fdd
 # ╠═15417b8a-fd8c-4174-9bea-7aadd422660f
 # ╟─70d1790d-7bb9-456d-82a3-cadae892803c
-# ╠═4155d55a-ea9c-4343-ae56-69705b94984b
-# ╠═9d1881e9-cdbd-4e6f-a52b-46c83e4e9734
+# ╟─4155d55a-ea9c-4343-ae56-69705b94984b
+# ╟─cd826b82-1249-4e88-ac2b-7a25bfe24f61
 # ╠═5112acd1-614a-48d3-b826-9a6a56b3ade9
-# ╠═f33dfb79-0b28-4d14-95b5-4c49c075114c
+# ╟─f33dfb79-0b28-4d14-95b5-4c49c075114c
