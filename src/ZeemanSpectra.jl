@@ -19,15 +19,11 @@ export I127, Li6
 
 const 𝜇B = μ_B / (ℎ * 𝑐) |> u"cm^-1/Gauss"
 const 𝜇N = 𝜇B * 𝑚e / 𝑚p
-const gS = 1.00115965218085 * 2 #https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.97.030801
 
 include("hamiltonian.jl")
 
 export zeeman_struc
 include("zeeman structure.jl")
-
-export einsteinA, aᵢⱼ
-include("transition cross section.jl")
 
 export zeeman_spec
 include("zeeman spectra.jl")

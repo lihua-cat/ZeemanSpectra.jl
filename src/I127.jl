@@ -8,12 +8,12 @@ end
 k_I127(F1, F2) = k_I127(F1, F2, F1, F2, 0u"Gauss")
 
 function A_I127(F1, F2)
-    L = (1, 1)
-	S = (1/2, 1/2)
+    L = 1
+	S = 1/2
 	J = (3/2, 1/2)
-	I = (5/2, 5/2)
+	I = 5/2
     k0 = k_I127(F1, F2)
-    return einsteinA(k0, L, S, J, I, (F1, F2), "M1")
+    return einsteinA(k0, L, S, J[1], I, F1, L, S, J[2], I, F2, "M1")
 end
 
 function σ0_I127(F1, F2; T::Unitful.AbsoluteScaleTemperature, P::Unitful.Pressure, γ = 5u"MHz/Torr")

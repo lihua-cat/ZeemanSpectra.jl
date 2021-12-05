@@ -47,7 +47,7 @@ function zeeman_spec(atom::Atom,
             ## radiation matrix element
             ket1 = df1[i, :Ket2]
             ket2 = df2[j, :Ket2]
-            c0 = relative_transition_intensity(ket1', ket2, order)^2
+            c0 = relative_transitionME(ket1', ket2, order)^2
             ## line profile
             ν0 = uconvert(unit(νp), k0 * 𝑐)
             νd = fwhm_doppler(ν0, atom.M, T)
@@ -63,9 +63,8 @@ function zeeman_spec(atom::Atom,
             end
             a = aᵢⱼ(k0, c0*ME^2)
             ## transition cross section
-            C2 = 1 / k0^2 / 8π
-            σ = C2 * a * lineshape .|> u"cm^2"
-            σ0 = C2 * a * peak |> u"cm^2"
+            σ = σᵢⱼ.(k0, a, lineshape)
+            σ0 = σᵢⱼ(k0, a, peak)
             ## df
             push!(df, (F1, MF1, F2, MF2, q, k0, c0, c, a, σ0, σ))
         end

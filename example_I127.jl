@@ -36,13 +36,18 @@ let
 end
 
 ##
-BF = 0.0u"Gauss"
+BF = 0u"Gauss"
 
 kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 
-T = 200u"K"
-P = 10u"Torr"
-νp = 2 * 5u"MHz/Torr" * P
+T = 150u"K"
+P = 2.8u"Torr"
+γ = 4.7u"MHz/Torr"
+νp = 2 * γ * P
+
+df0 = zeeman_spec(atom, 0, 1, kx, T, νp, "M1", zero(BF))
+# c34 = maximum(sum(filter(row->row.F1==4&&row.F2==3&&abs(row.q)==0, df0).c))
+σ34 = σ0_I127(4, 3, T=T, P=P, γ=γ) * 7 / 3
 
 df_spec = zeeman_spec(atom, 0, 1, kx, T, νp, "M1", BF)
 
@@ -56,8 +61,8 @@ let
     offset = round(Int, kxu[1])
 
     for F1 in Set(dfq.F1), F2 in Set(dfq.F2)
-        p = sum(filter(row->row.F1==F1&&row.F2==F2, dfq).c)
-        lines!(ax, kxu .- offset, p, label = "$F2 -> $F1")
+        p = sum(filter(row->row.F1==F1&&row.F2==F2, dfq).σ )/σ34
+        lines!(ax, kxu .- offset, p, label = L"%$F2 \rightarrow %$F1")
     end
     # lines!(ax, kxu .- offset, sum(dfq.c), linestyle = :dash)
     # line_p = lines!(ax, kxu .- offset, sum(df_spec[df_spec.q .== 0, :c]), label = "q = 0")
@@ -65,6 +70,7 @@ let
 
     ax.xtickformat = xs -> ["$(x + offset)" for x in xs]
     axislegend()
+    # ylims!(0, 1)
     fig
 end
 

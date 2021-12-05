@@ -4,25 +4,21 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 49bb3630-4e0d-11ec-39f2-c3d1023de02a
+# ╔═╡ 212e59d1-140e-41f9-bc67-493d2d61d008
 begin
 	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.add(url = "https://github.com/lihua-cat/UsefulFunctions.jl")
-	Pkg.add(url = "https://github.com/lihua-cat/AtomData.jl")
-	Pkg.add(url = "https://github.com/lihua-cat/AtomBase.jl")
-	Pkg.add(url = "https://github.com/lihua-cat/LineProfile.jl")
-	Pkg.add(url = "https://github.com/lihua-cat/ZeemanSpectra.jl")
-	Pkg.add("DataFrames")
-	Pkg.add("Unitful")
-	Pkg.add("PhysicalConstants")
+	Pkg.activate("..")
+	Text(sprint(io->Pkg.status(io=io)))
 end
 
-# ╔═╡ f1c7f04c-65e5-4cae-b3fe-42e3fefd058d
-using ZeemanSpectra
+# ╔═╡ 37294fc5-c716-4e79-81a3-7a4b08cbe599
+push!(LOAD_PATH, "C:\\Users\\lihua\\.julia\\dev")
 
-# ╔═╡ d1651f70-47c1-4ce7-9f6c-bac9693d12aa
-using AtomData, AtomBase
+# ╔═╡ 2e60614f-4af7-43bf-b926-1b5425aec7bd
+using Revise
+
+# ╔═╡ f1c7f04c-65e5-4cae-b3fe-42e3fefd058d
+using ZeemanSpectra, AtomBase
 
 # ╔═╡ e51ad0a1-60b6-4ac0-8a36-853cdf1b036a
 using Unitful
@@ -33,8 +29,20 @@ using DataFrames
 # ╔═╡ 55c722e9-6cf0-465a-bd63-aa15d417ae34
 using Printf
 
+# ╔═╡ b1464c4d-47a4-47c6-9676-ba4627260845
+html"""<style>
+main {
+    max-width: 900px;
+    align-self: flex-start;
+    margin-left: 50px;
+}
+"""
+
 # ╔═╡ 2a810db4-e771-432d-8880-45667807d507
 import PhysicalConstants.CODATA2018: h, μ_B, μ_0
+
+# ╔═╡ 7a83f3ae-206f-4757-b80b-7299e32b9089
+lande(1, 1/2, 1/2, gl = 1, gs = 2.002319304362)
 
 # ╔═╡ 8d1d5ad5-5f2b-4ffc-8cc5-959aa79ba342
 md"## Atom Data"
@@ -120,7 +128,7 @@ md"see fig.1 in [2]"
 md"### Transition lines"
 
 # ╔═╡ 48777912-33ef-474d-bcdc-13caac6bb977
-md"1.wavenumber, relative intensity and Einstein A coefficient"
+md"### 1.wavenumber, relative intensity and Einstein A coefficient"
 
 # ╔═╡ e348d5ba-29a1-4f53-9608-d47d0afad7df
 let
@@ -170,7 +178,7 @@ uncoup_T1(3/2, 5/2, 4, 1/2, 5/2, 3, 1)^2 * 7.939805013011782 * 2 / 7
 uncoup_T1(3/2, 5/2, 3, 1/2, 5/2, 3, 1)^2 * 7.939805013011782 * 2 / 7
 
 # ╔═╡ 70d1790d-7bb9-456d-82a3-cadae892803c
-md"2.transition cross section"
+md"### 2.transition cross section"
 
 # ╔═╡ 4155d55a-ea9c-4343-ae56-69705b94984b
 df_spec = let
@@ -209,7 +217,34 @@ let
 end
 
 # ╔═╡ 5112acd1-614a-48d3-b826-9a6a56b3ade9
-σ0_I127(4, 3, T = 200u"K", P = 0u"Torr") * 7/12
+σ0_I127(4, 3, T = 200u"K", P = 0u"Torr")
+
+# ╔═╡ ad6376f7-8600-40fe-8864-dbaa49bef2c3
+let
+	BF = 0.0u"Gauss"
+	kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
+	
+	T = 200u"K"
+	P = 0u"Torr"
+	νp = 2 * 5u"MHz/Torr" * P
+
+	df_spec = zeeman_spec(atom, 0, 1, kx, T, νp, "M1", BF)
+	df_new = DataFrame(F1=[], F2=[], k=[], c=[], A=[], σ0=[], σ=[])
+	for F1 in Set(df_spec.F1), F2 in Set(df_spec.F2)
+		df = filter(row->row.F1==F1&&row.F2==F2, df_spec)
+		k = df.k0[1]
+		c = sum(df.c0)
+		A = sum(df.a)/(2F2+1)
+		σ0 = sum(df.σ0)/(2F2+1)
+		σ = sum(df.σ)/(2F2+1)
+		push!(df_new, (F1, F2, k, c, A, σ0, σ))
+	end
+	sort!(df_new, [:c, :A], rev=true)
+	df_new
+end
+
+# ╔═╡ a524ef95-3382-4b14-bc5a-6a4d79c39c67
+line_I127(4, 3)
 
 # ╔═╡ f33dfb79-0b28-4d14-95b5-4c49c075114c
 md"""
@@ -222,15 +257,18 @@ md"""
 """
 
 # ╔═╡ Cell order:
-# ╠═49bb3630-4e0d-11ec-39f2-c3d1023de02a
+# ╠═b1464c4d-47a4-47c6-9676-ba4627260845
+# ╠═2e60614f-4af7-43bf-b926-1b5425aec7bd
+# ╠═37294fc5-c716-4e79-81a3-7a4b08cbe599
+# ╠═212e59d1-140e-41f9-bc67-493d2d61d008
 # ╠═f1c7f04c-65e5-4cae-b3fe-42e3fefd058d
-# ╠═d1651f70-47c1-4ce7-9f6c-bac9693d12aa
 # ╠═e51ad0a1-60b6-4ac0-8a36-853cdf1b036a
 # ╠═2a810db4-e771-432d-8880-45667807d507
 # ╠═811f6a70-a9d6-41bb-bf39-d2a13c26b4cc
 # ╠═55c722e9-6cf0-465a-bd63-aa15d417ae34
+# ╠═7a83f3ae-206f-4757-b80b-7299e32b9089
 # ╟─8d1d5ad5-5f2b-4ffc-8cc5-959aa79ba342
-# ╟─5f8a9c94-b0b1-4bb3-ae81-a664863dbe53
+# ╠═5f8a9c94-b0b1-4bb3-ae81-a664863dbe53
 # ╟─a2bafc87-52ef-4667-b907-9c9d920dd258
 # ╟─61054b00-6b53-4fab-abd4-f454f80f59e1
 # ╟─773bab65-0dcd-4400-9b7f-8dec6effad8e
@@ -251,4 +289,6 @@ md"""
 # ╟─4155d55a-ea9c-4343-ae56-69705b94984b
 # ╟─cd826b82-1249-4e88-ac2b-7a25bfe24f61
 # ╠═5112acd1-614a-48d3-b826-9a6a56b3ade9
+# ╟─ad6376f7-8600-40fe-8864-dbaa49bef2c3
+# ╠═a524ef95-3382-4b14-bc5a-6a4d79c39c67
 # ╟─f33dfb79-0b28-4d14-95b5-4c49c075114c
