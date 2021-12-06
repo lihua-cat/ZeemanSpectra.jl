@@ -28,7 +28,7 @@ include("zeeman structure.jl")
 export zeeman_spec
 include("zeeman spectra.jl")
 
-export k_I127, A_I127, σ0_I127, line_I127
+export k_I127, A_I127, σ0_I127, line_I127, σm_I127
 include("I127.jl")
 
 end

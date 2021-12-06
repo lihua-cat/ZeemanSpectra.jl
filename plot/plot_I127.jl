@@ -125,6 +125,6 @@ let
     # ylims!(-0.02, 1)
     ax.yticks = 0:0.2:1.0
     ax.xticks = 0:50:600
-    save("./plot/relatvie_ssg_I127.svg", fig, px_per_unit = 0.5)
+    # save("./plot/relatvie_ssg_I127.svg", fig, px_per_unit = 0.5)
     fig
 end

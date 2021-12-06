@@ -37,3 +37,18 @@ function line_I127(F1, F2)
     e = ℎ * ν |> u"J"
     (;k, A, ν, λ, e)
 end
+
+function σm_I127(F1, F2, BF, p; T, P, γ)
+	kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
+	df = zeeman_spec(I127, 0, 1, kx, T, 2P*γ, "M1", BF)
+	dff = filter(row->row.F1==F1&&row.F2==F2, df)
+	if p == "P"
+		dfff = filter(row->row.q==0, dff)
+		σ = sum(dfff.σ) * 3
+	elseif p == "S"
+		dfff = filter(row->abs(row.q)==1, dff)
+		σ = sum(dfff.σ) / 2 * 3
+	end
+    σm = maximum(σ)
+	return σm
+end
