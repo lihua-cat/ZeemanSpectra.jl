@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.2
+# v0.17.3
 
 using Markdown
 using InteractiveUtils
@@ -245,7 +245,7 @@ line_I127(4, 3)
 md"### nonzero field"
 
 # ╔═╡ 579d0e52-fe79-4678-a21e-326b6773d341
-md"#### Energy splits"
+md"#### energy splits"
 
 # ╔═╡ 55440c43-8999-484d-bbf5-3d234841289b
 let
@@ -288,7 +288,7 @@ P = 10u"Torr"
 
 # ╔═╡ 4fb83bab-da18-4934-a7ab-000979952ad9
 let
-	BF = 0u"Gauss"
+	BF = 400u"Gauss"
 
 	kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 	
@@ -301,9 +301,9 @@ let
 	df_spec = zeeman_spec(atom, 0, 1, kx, T, νp, "M1", BF)
 
     fig = Figure(resolution = (1200, 600), fontsize = 24, font = "sans")
-    ax1 = Axis(fig[1, 1], title = "P", palette = (color = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#e377c2", "#bcbd22", "#17becf"],))
-	ax2 = Axis(fig[1, 2], title = "S", palette = (color = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#e377c2", "#bcbd22", "#17becf"],))
-	hideydecorations!(ax2; label = true, ticklabels = true, ticks = true, grid = false, minorgrid = false, minorticks = false)
+    ax1 = Axis(fig[1, 1], palette = (color = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#e377c2", "#bcbd22", "#17becf"],))
+	ax2 = Axis(fig[1, 2], palette = (color = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#e377c2", "#bcbd22", "#17becf"],))
+	hideydecorations!(ax2; label = true, ticklabels = true, ticks = true, grid = false, minorgrid = true, minorticks = false)
     linkyaxes!(ax1, ax2)
 
     df_p = filter(row->row.q == 0, df_spec)
@@ -322,9 +322,81 @@ let
     ax1.xtickformat = xs -> ["$(x + offset)" for x in xs]
 	ax2.xtickformat = xs -> ["$(x + offset)" for x in xs]
 	ax1.yticks = 0:0.2:1
+	ax2.yticks = 0:0.2:1
     axislegend(ax2)
 	ylims!(-0.02, 1.02)
+
+	# ax_1 = Axis(fig, bbox = BBox(300, 600, 250, 540), xticklabelsize = 12, yticklabelsize = 12, showgrid=false)
 	
+    fig
+end
+
+# ╔═╡ a53fea9a-a82a-4967-936e-9660999d3ebf
+let 
+	BF = 400u"Gauss"
+	F1, F2 = 4, 3
+	k0 = k_I127(F1, F2)
+	kx_0 = collect(k0-0.05u"cm^-1":0.0001u"cm^-1":k0+0.05u"cm^-1")
+	df = filter(row->row.F1==F1&&row.F2==F2, zeeman_spec(atom, 0, 1, kx_0, T, 2P*γ, "M1", BF))
+	σ34_0 = σ0_I127(F1, F2, T = T, P = P, γ = γ)
+	
+    cycle = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+    offset = round(ustrip.(u"cm^-1", k0), digits = 2)
+    x = ustrip.(u"cm^-1", kx_0) .- offset
+    fig = Figure(resolution = (1200, 600), fontsize = 24, font = "sans")
+
+    ax1 = Axis(fig[1,1], xlabel = "", ylabel = "Relative transition cross-section", xticks = LinearTicks(6), yticks = LinearTicks(6))
+    ax2 = Axis(fig[1,2], xlabel = "", ylabel = "", xticks = LinearTicks(6), yticks = LinearTicks(6))
+    hideydecorations!(ax2; label = true, ticklabels = true, ticks = true, grid = false,
+        minorgrid = false, minorticks = false)
+    linkyaxes!(ax1, ax2)
+	ax = Axis(fig[1, 1:2], xlabel="Wavenumber(cm⁻¹)")
+	hideydecorations!(ax)
+	hidexdecorations!(ax, label=false, ticklabels=false)
+	hidespines!(ax)
+	ax.xtickformat = xs -> [" " for x in xs]
+
+    σp = zeros(length(kx_0))
+    σs = zeros(length(kx_0))
+    for row in eachrow(df)
+        k = ustrip.(u"cm^-1", row.k0) - offset
+        if row.q == 0
+            σ = ustrip.(NoUnits, row.σ*3/σ34_0/(2F2+1))
+            σm = maximum(σ)
+            lc = cycle[1]
+            σp .+= σ
+            lines!(ax1, x, σ, lw = 2, color = lc)
+            # text!(ax1, L"%$(row.MF2)\rightarrow%$(row.MF1)", position = (k, σm), textsize = 16, align = (:center, :baseline))
+        else
+            σ = ustrip.(NoUnits, row.σ/2*3/σ34_0/(2F2+1))
+            σm = maximum(σ)
+            σs .+= σ
+            if row.q == 1
+                lc = cycle[2]
+            elseif row.q == -1
+                lc = cycle[3]
+            end
+            lines!(ax2, x, σ, lw = 2, color = lc)
+            # text!(ax2, L"%$(row.MF2)\rightarrow%$(row.MF1)", position = (k, σm), textsize = 16, align = (:center, :baseline))
+        end
+    end
+    lines!(ax1, x, σp, linewidth = 2, color = cycle[4], linestyle = :dash)
+    lines!(ax2, x, σs, linewidth = 2, color = cycle[5], linestyle = :dash)
+    # xlims!(ax1, x[1], x[end])
+    ylims!(ax1, 0, nothing)
+
+    Label(fig[1, 1], "(a)", textsize = 30, tellheight = false, tellwidth = false, halign = :left, valign = :top, padding = (10, 10, 10, 10))
+    Label(fig[1, 2], "(b)", textsize = 30, tellheight = false, tellwidth = false, halign = :left, valign = :top, padding = (10, 10, 10, 10))
+
+    elem_1 = LineElement(color = cycle[1])
+    elem_2 = LineElement(color = cycle[2])
+    elem_3 = LineElement(color = cycle[3])
+    elem_4 = LineElement(color = cycle[4], linestyle = :dash)
+    elem_5 = LineElement(color = cycle[5], linestyle = :dash)
+    Legend(fig[1, 1], [elem_1, elem_4], [L"\Delta M_F = 0", L"P"], tellwidth = false, halign = :right, valign = :top, labelhalign = :center, framevisible = true, labelsize = 20)
+    Legend(fig[1, 2], [elem_2, elem_3, elem_5], [L"\Delta M_F = +1", L"\Delta M_F = -1", L"S"], tellwidth = false, halign = :right, valign = :top, labelhalign = :center, framevisible = true, labelsize = 20)
+    # save("../plot/relative_cross_section_I127.svg", fig, px_per_unit = 0.5)
+    # save("./plot/relative_cross_section_I127.png", fig, px_per_unit = 0.5)
     fig
 end
 
@@ -378,7 +450,21 @@ end
 σm_I127(3, 3, 0u"Gauss", "P"; T = T, P = P, γ = γ) / 7
 
 # ╔═╡ bc9aa2fd-e9af-4f85-a7d7-587810ef638e
-σm_I127(3, 3, 0u"Gauss", "S"; T = T, P = P, γ = γ) / 7
+σm_I127(3, 2, 0u"Gauss", "S"; T = T, P = P, γ = γ) / 5
+
+# ╔═╡ a54ea489-4620-411f-bca2-60f26f87fc48
+let
+	σ34 = σ0_I127(4, 3, T=T, P=P, γ=γ) * 7
+	B_range = 0:20:600
+	σm43 = σm_I127.(4, 3, B_range * u"Gauss", "S", T=T, P=P, γ=γ) / σ34
+	σm22 = σm_I127.(2, 2, B_range * u"Gauss", "S", T=T, P=P, γ=γ) / σ34
+
+	fig = Figure(resolution = (1200, 600), fontsize = 24, font = "sans")
+	ax = Axis(fig[1, 1])
+	lines!(ax, B_range, σm43)
+	lines!(ax, B_range, σm22)
+	fig
+end
 
 # ╔═╡ f33dfb79-0b28-4d14-95b5-4c49c075114c
 md"""
@@ -435,8 +521,10 @@ md"""
 # ╟─a2f787ed-ed51-441d-a58c-b342cdfb7a29
 # ╟─22251140-ae5d-4736-a926-6729f6d9ea29
 # ╟─8cba09c5-4a1c-4bc5-aada-2df6da6a52a5
-# ╟─4fb83bab-da18-4934-a7ab-000979952ad9
-# ╠═a9ae9150-9ad1-44fd-9773-360710f1c4f5
+# ╠═4fb83bab-da18-4934-a7ab-000979952ad9
+# ╠═a53fea9a-a82a-4967-936e-9660999d3ebf
+# ╟─a9ae9150-9ad1-44fd-9773-360710f1c4f5
 # ╠═f4f8fc03-2ce6-4bd1-8bce-f7f04fe12854
 # ╠═bc9aa2fd-e9af-4f85-a7d7-587810ef638e
+# ╟─a54ea489-4620-411f-bca2-60f26f87fc48
 # ╟─f33dfb79-0b28-4d14-95b5-4c49c075114c
