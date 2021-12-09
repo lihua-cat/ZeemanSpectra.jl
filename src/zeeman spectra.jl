@@ -34,6 +34,8 @@ function zeeman_spec(atom::Atom,
         σ0 = Area[],
         σ = Vector{Area}[]
     )
+    order = parse(Int, term[end])
+    νx = uconvert.(unit(νp), kx * 𝑐)
     for i = 1:n1, j = 1:n2
         F1 = df1[i, :F]
         F2 = df2[j, :F]
@@ -41,7 +43,6 @@ function zeeman_spec(atom::Atom,
         MF2 = df2[j, :MF]
         q = MF1 - MF2
         k0 = abs(df1[i, :E] - df2[j, :E])
-        order = parse(Int, term[end])
         abs(q) > order && continue
         ## radiation matrix element
         ket1 = df1[i, :Ket2]
@@ -50,7 +51,6 @@ function zeeman_spec(atom::Atom,
         ## line profile
         ν0 = uconvert(unit(νp), k0 * 𝑐)
         νd = fwhm_doppler(ν0, atom.M, T)
-        νx = uconvert.(unit(νp), kx * 𝑐)
         peak = profile_voigt(ν0; ν0 = ν0, νd = νd, νp = νp)
         lineshape = profile_voigt.(νx; ν0 = ν0, νd = νd, νp = νp)
         c = c0 * ustrip.(lineshape)
