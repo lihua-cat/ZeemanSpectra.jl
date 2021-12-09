@@ -16,6 +16,7 @@ function A_I127(F1, F2)
     return einsteinA(k0, L, S, J[1], I, F1, L, S, J[2], I, F2, "M1")
 end
 
+"g = σ * (Nu - gl/gu * Nl)"
 function σ0_I127(F1, F2; T::Unitful.AbsoluteScaleTemperature, P::Unitful.Pressure, γ = 5u"MHz/Torr")
     M = I127.M
     A = A_I127(F1, F2)
@@ -38,6 +39,7 @@ function line_I127(F1, F2)
     (;k, A, ν, λ, e)
 end
 
+"g = σ * (Nᵢ - Nⱼ)"
 function σm_I127(F1, F2, BF, p; T, P, γ)
 	kx = collect(7602.2:0.0001:7603.8)u"cm^-1"
 	df = zeeman_spec(I127, 0, 1, kx, T, 2P*γ, "M1", BF)

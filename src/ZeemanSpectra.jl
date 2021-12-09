@@ -17,10 +17,11 @@ using LineProfile
 
 export I127, Li6
 
-const 𝜇B = μ_B / (ℎ * 𝑐) |> u"cm^-1/Gauss"
+# const 𝜇B = μ_B / (ℎ * 𝑐) |> u"cm^-1/Gauss"
+const 𝜇B = ustrip(u"cm^-1/Gauss", μ_B / (ℎ * 𝑐))
 const 𝜇N = 𝜇B * 𝑚e / 𝑚p
 
-include("hamiltonian.jl")
+# include("hamiltonian.jl")
 
 export zeeman_struc
 include("zeeman structure.jl")
