@@ -5,6 +5,7 @@ using Unitful
 import Unitful: Wavenumber, Frequency, Area, BField, Quantity
 using HalfIntegers
 using DataFrames
+using Interpolations
 
 import Base: nameof
 nameof(::Type{Wavenumber}) = :Wavenumber
@@ -29,7 +30,7 @@ include("zeeman structure.jl")
 export zeeman_spec
 include("zeeman spectra.jl")
 
-export k_I127, A_I127, σ0_I127, line_I127, σm_I127
+export k_I127, A_I127, σ0_I127, line_I127, σm_I127, σr_ltp
 include("I127.jl")
 
 end
