@@ -24,8 +24,8 @@ ZeemanSpectra.jl is a julia package for computing hyperfine structure of alkali 
     - [x] Wigner-Eckart theorem
     - [x] ...
 6. Transition line strength
-    - [ ] E1 Electric diople radiation
-    - [ ] M1 Magnetic diople radiation
+    - [x] E1 Electric diople radiation
+    - [x] M1 Magnetic diople radiation
 7. Spectral line broadenings
     - [x] doppler
     - [x] pressure
