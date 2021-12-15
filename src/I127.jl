@@ -56,8 +56,8 @@ function σm_I127(F1, F2, BF, p; T, P, γ)
 end
 
 function σr_ltp(F1, F2, B_sample, p; T, P, γ)
-	σ43 = σ0_I127(4, 3, T=T, P=P, γ=γ) * 7
-	σm = σm_I127.(F1, F2, B_sample*u"Gauss", p, T=T, P=P, γ=γ) / σ43
+	σ0 = σ0_I127(F1, F2, T=T, P=P, γ=γ) * (2F2 + 1)
+	σm = σm_I127.(F1, F2, B_sample*u"Gauss", p, T=T, P=P, γ=γ) / σ0
 	ltp = LinearInterpolation(B_sample, σm)
 	return ltp
 end
