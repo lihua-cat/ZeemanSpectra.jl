@@ -1,6 +1,6 @@
 # ZeemanSpectra.jl
 
-ZeemanSpectra.jl is a julia package for computing hyperfine structure of alkali atoms (and iodine atom) in weak ambient magnetic field.
+ZeemanSpectra.jl is a julia package for computing hyperfine structure of alkali atoms (and iodine atom) in weak magnetic field (relative to fine structure).
 
 ## Roadmap
 1. Atom data
@@ -15,9 +15,9 @@ ZeemanSpectra.jl is a julia package for computing hyperfine structure of alkali 
     - [x] ladder operator: $J_+$ and $J_-$ ($I$ as well)
     - [x] $J^2$, $J_z$ ($I$ as well)
     - [x] any combination of above oprators, such as $J_zJ_+I_zI_-$
-3. Perturbed hamiltonian matrix of zeeman effect and the hyperfine interaction
+3. Perturbed Hamiltonian consisting of zeeman effect and hyperfine interaction
     - [x] $\hat{H'} = \hat{H}_{Zeeman} + \hat{H}_{hfs}$
-4. Degenerate perturbation theory (hamiltonian diagonalization)
+4. Degenerate perturbation theory (Hamiltonian diagonalization)
     - [x] level splits (eigenvalues)
     - [x] quantum states (eigenstates)
 5. Irreducible tensor operators
